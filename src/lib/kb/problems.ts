@@ -1,12 +1,13 @@
-// The problems inside one merged ticket. causes.ts tells parser from hint by tenant and form;
-// the reports the desk read as a one-day move (desk-notes.json) are a problem of their own.
+// The problems inside one merged ticket. causes.ts tells parser from hint by tenant and form, and every
+// report is counted under that cause, as the desk files it. The reports the desk read as a one-day move
+// (desk-notes.json) are a problem of their own too: counted under their cause and again as `shift`.
 import { causeOf, uniqueById, type Report, type Tenant } from '#lib/kb/causes';
 
 export type Problem = 'parser' | 'hint' | 'shift' | 'unplaced';
 
-export function problemOf(r: Report, t: Tenant | undefined, oneDayMove: readonly string[]): Problem {
-  if (oneDayMove.includes(r.id)) return 'shift';
-  return causeOf(r, t) ?? 'unplaced';
+export function problemsOf(r: Report, t: Tenant | undefined, oneDayMove: readonly string[]): Problem[] {
+  const filed: Problem = causeOf(r, t) ?? 'unplaced';
+  return oneDayMove.includes(r.id) ? [filed, 'shift'] : [filed];
 }
 
 export type ProblemGroup = { problem: Problem; reports: Report[]; tenants: number; channels: string[]; firstSeen: string; lastSeen: string };
@@ -21,8 +22,7 @@ export function problemsIn(
   const unique = uniqueById(merged);
   const by = new Map<Problem, Report[]>();
   for (const r of unique) {
-    const p = problemOf(r, tenantOf(r), oneDayMove);
-    by.set(p, [...(by.get(p) ?? []), r]);
+    for (const p of problemsOf(r, tenantOf(r), oneDayMove)) by.set(p, [...(by.get(p) ?? []), r]);
   }
   const groups = [...by.entries()]
     .map(([problem, rs]) => {

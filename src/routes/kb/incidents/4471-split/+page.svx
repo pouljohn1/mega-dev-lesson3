@@ -4,7 +4,7 @@ title: '#4471 · three problems, one ticket'
 owner: Paul
 status: open
 reviewed: 2026-10-28
-signature: Paul
+signature: v1.eyJzdWIiOiIyODY1IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMyMTEwNDEsImV4cCI6MTc5MzI5NzQ0MX0.y4INIhxdL82twXK-cvVc6bwHFdqvfxNmRLs4spAhfSM
 ---
 
 <script>
@@ -14,27 +14,29 @@ signature: Paul
 
   const repo = 'https://github.com/pouljohn1/mega-dev-lesson3/issues';
   const tickets = {
-    parser: { label: 'issue 1', href: `${repo}/1` },
-    hint: { label: 'issue 2', href: `${repo}/2` },
-    shift: { label: 'issue 3', href: `${repo}/3` },
+    parser: { label: 'issue 1 · fixed', href: `${repo}/1` },
+    hint: { label: "issue 2 · won't fix", href: `${repo}/2` },
+    shift: { label: 'issue 3 · open', href: `${repo}/3` },
   };
 </script>
 
-[#4471](/kb/incidents/4471) is marked known: one issue, one fix queued. The reports in it describe three problems. The queued parser fix solves the first one only.
+[#4471](/kb/incidents/4471) was marked known: one issue, one fix queued. The reports in it describe three problems. Engineering closed #4471 on 5 October: the parser fix shipped and the booking-v3 form was retired. That covers two of the three. Bookings that move by one day are still open.
 
 <Callout kind="warn">
-Not one issue. Three problems, each with its own ticket. Keep #4471 open until all three are fixed.
+Not one issue. Three problems, each with its own ticket. Closing #4471 did not fix the one-day move.
 </Callout>
 
 ## The problems
 
 <ProblemTable ticket={4471} {tickets} />
 
+The table counts each report where the desk files it, by tenant and way in. The 5 one-day moves are filed under `parser` and counted there too; they are the whole of `shift`.
+
 ## What each one is
 
-- **`parser`**: the shared parser reads every date month first, and every tenant on file writes the day first. Day and month swap: 7 April becomes 4 July. It comes in through the app, email and the booking-v2 form. This is the fix queued under #4471.
-- **`hint`**: the booking-v3 form prints `MM/DD/YYYY` under its date field. People at day-first tenants type month first, as the hint asks, and the form reads it day first. The swap looks the same as `parser`, but the parser fix does not reach it. Only form reports from tenants on booking-v3.
-- **`shift`**: the date is not swapped. It moves by one day depending on where the invite is read ("Client in Lisbon got Tuesday. Client in Toronto got Monday."). The desk listed these reports in its notes as a one-day move but filed them under `parser`.
+- **`parser`**, fixed: the shared parser read every date month first, and every tenant on file writes the day first. Day and month swapped: 7 April became 4 July. It came in through the app, email and the booking-v2 form. Fixed by `fix(dates): parse dd/mm for eu locales`.
+- **`hint`**, won't fix: the booking-v3 form printed `MM/DD/YYYY` under its date field. People at day-first tenants typed month first, as the hint asked, and the form read it day first. The swap looked the same as `parser`, but the parser fix did not reach it. Only form reports from tenants on booking-v3. The form is retired, so no new reports come this way.
+- **`shift`**, open: the date is not swapped. It moves by one day depending on where the invite is read ("Client in Lisbon got Tuesday. Client in Toronto got Monday."). The desk listed these reports in its notes as a one-day move but filed them under `parser`. Neither the parser fix nor retiring the form touches it.
 
 ## How they ended up in one ticket
 
@@ -42,7 +44,7 @@ Triage merges a report when its subject matches an open ticket ([decision 0001](
 
 ## For the desk
 
-- A new date report: find its problem in the table above, by tenant and way in, and add it to that ticket, not to #4471.
-- A report that moves a date by one day without swapping it belongs to `shift`, whatever its subject.
+- A new report of a swapped day and month after 5 October: the parser fix did not hold for it. Open a new ticket, do not reopen #4471.
+- A report that moves a date by one day without swapping it belongs to `shift` (issue 3), whatever its subject.
 
 <RenderStamp {signature} />
