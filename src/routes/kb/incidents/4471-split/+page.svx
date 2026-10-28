@@ -1,0 +1,48 @@
+---
+layout: runbook
+title: '#4471 · three problems, one ticket'
+owner: Paul
+status: open
+reviewed: 2026-10-28
+signature: Paul
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const repo = 'https://github.com/pouljohn1/mega-dev-lesson3/issues';
+  const tickets = {
+    parser: { label: 'issue 1', href: `${repo}/1` },
+    hint: { label: 'issue 2', href: `${repo}/2` },
+    shift: { label: 'issue 3', href: `${repo}/3` },
+  };
+</script>
+
+[#4471](/kb/incidents/4471) is marked known: one issue, one fix queued. The reports in it describe three problems. The queued parser fix solves the first one only.
+
+<Callout kind="warn">
+Not one issue. Three problems, each with its own ticket. Keep #4471 open until all three are fixed.
+</Callout>
+
+## The problems
+
+<ProblemTable ticket={4471} {tickets} />
+
+## What each one is
+
+- **`parser`**: the shared parser reads every date month first, and every tenant on file writes the day first. Day and month swap: 7 April becomes 4 July. It comes in through the app, email and the booking-v2 form. This is the fix queued under #4471.
+- **`hint`**: the booking-v3 form prints `MM/DD/YYYY` under its date field. People at day-first tenants type month first, as the hint asks, and the form reads it day first. The swap looks the same as `parser`, but the parser fix does not reach it. Only form reports from tenants on booking-v3.
+- **`shift`**: the date is not swapped. It moves by one day depending on where the invite is read ("Client in Lisbon got Tuesday. Client in Toronto got Monday."). The desk listed these reports in its notes as a one-day move but filed them under `parser`.
+
+## How they ended up in one ticket
+
+Triage merges a report when its subject matches an open ticket ([decision 0001](/kb/decisions/0001-dedupe-by-subject)). These subjects are generic ("Date is wrong", "Month and day swapped?"), so every date report landed in #4471, whatever its cause. The intake tag does not separate them either: intake guesses from the reporter's browser, and the cause depends on the tenant and the way in.
+
+## For the desk
+
+- A new date report: find its problem in the table above, by tenant and way in, and add it to that ticket, not to #4471.
+- A report that moves a date by one day without swapping it belongs to `shift`, whatever its subject.
+
+<RenderStamp {signature} />
